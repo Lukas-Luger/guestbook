@@ -28,7 +28,7 @@ import javax.validation.constraints.NotBlank;
  * @see GuestbookController#addEntry(GuestbookForm, org.springframework.validation.Errors, org.springframework.ui.Model)
  */
 class GuestbookForm {
-
+	private final @NotBlank String email;
 	private final @NotBlank String name;
 	private final @NotBlank String text;
 
@@ -42,8 +42,9 @@ class GuestbookForm {
 	 * @param name the value to bind to {@code name}
 	 * @param text the value to bind to {@code text}
 	 */
-	public GuestbookForm(String name, String text) {
-
+	public GuestbookForm(String email, String name, String text) {
+		
+		this.email = email;
 		this.name = name;
 		this.text = text;
 	}
@@ -69,6 +70,17 @@ class GuestbookForm {
 	public String getText() {
 		return text;
 	}
+	
+	/**
+	 * Returns the value bound to the {@code email} attribute of the request. Needs to be public so that Spring will
+	 * actually consider it for form data binding until
+	 * {@link https://github.com/spring-projects/spring-framework/issues/22600} is resolved.
+	 *
+	 * @return the value bound to {@code email}
+	 */
+	public String getEmail() {
+		return email;
+	}
 
 	/**
 	 * Returns a new {@link GuestbookEntry} using the data submitted in the request.
@@ -77,6 +89,6 @@ class GuestbookForm {
 	 * @throws IllegalArgumentException if you call this on an instance without the name and text actually set.
 	 */
 	GuestbookEntry toNewEntry() {
-		return new GuestbookEntry(getName(), getText());
+		return new GuestbookEntry(getEmail(),getName(), getText());
 	}
 }

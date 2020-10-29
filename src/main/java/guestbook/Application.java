@@ -17,6 +17,7 @@ package guestbook;
 
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,6 +26,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -60,10 +67,10 @@ public class Application {
 		return args -> {
 
 			Stream.of( //
-					new GuestbookEntry("H4xx0r", "first!!!"), //
-					new GuestbookEntry("Arni", "Hasta la vista, baby"), //
-					new GuestbookEntry("Duke Nukem", "It's time to kick ass and chew bubble gum. And I'm all out of gum."), //
-					new GuestbookEntry("Gump1337",
+					new GuestbookEntry("hallo@was.de","H4xx0r", "first!!!"), //
+					new GuestbookEntry("mett@fleisch.com","Arni", "Hasta la vista, baby"), //
+					new GuestbookEntry("löwe@zoo.de","Duke Nukem", "It's time to kick ass and chew bubble gum. And I'm all out of gum."), //
+					new GuestbookEntry("ratte@keller.fr","Gump1337",
 							"Mama always said life was like a box of chocolates. You never know what you're gonna get.")) //
 					.forEach(guestbook::save);
 		};
@@ -76,7 +83,8 @@ public class Application {
 	@Configuration
 	@EnableGlobalMethodSecurity(prePostEnabled = true)
 	static class SecurityConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
-
+		@Autowired
+		private PasswordEncoder passwordEncoder;
 		/*
 		 * (non-Javadoc)
 		 * @see org.springframework.web.servlet.config.annotation.WebMvcConfigurer#addViewControllers(org.springframework.web.servlet.config.annotation.ViewControllerRegistry)
@@ -87,11 +95,23 @@ public class Application {
 			// Route requests to /login to the login view (a default one provided by Spring Security)
 			registry.addViewController("/login").setViewName("login");
 		}
-
+		@Bean
+		public PasswordEncoder encoder() {
+		    return new BCryptPasswordEncoder();
+		}
+		
+		@Bean
+		public UserDetailsService userDetailsService() {
+			InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+			UserDetails admin = User.withUsername("admin").password(passwordEncoder.encode("test")).roles("ADMIN").build();
+			manager.createUser(admin);
+			return manager;
+		}
 		/*
 		 * (non-Javadoc)
 		 * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.HttpSecurity)
 		 */
+		
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
