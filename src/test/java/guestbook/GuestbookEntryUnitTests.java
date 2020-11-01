@@ -30,18 +30,25 @@ class GuestbookEntryUnitTests {
 	void rejectsEmptyName() {
 
 		assertThatExceptionOfType(IllegalArgumentException.class)//
-				.isThrownBy(() -> new GuestbookEntry("", "May the 4th be with you!"));
+				.isThrownBy(() -> new GuestbookEntry("","", "May the 4th be with you!"));
 	}
 
 	@Test
 	void rejectsEmptyText() {
 
 		assertThatExceptionOfType(IllegalArgumentException.class)//
-				.isThrownBy(() -> new GuestbookEntry("Ollie", ""));
+				.isThrownBy(() -> new GuestbookEntry("hello@example.com","Ollie", ""));
+	}
+	
+	@Test
+	void rejectsEmptyEmail() {
+
+		assertThatExceptionOfType(IllegalArgumentException.class)//
+				.isThrownBy(() -> new GuestbookEntry("","Ollie", "May the 4th be with you!"));
 	}
 
 	@Test
 	void setsCreationDate() {
-		assertThat(new GuestbookEntry("Ollie", "May the 4th be with you!").getDate()).isNotNull();
+		assertThat(new GuestbookEntry("hello@eample.com","Ollie", "May the 4th be with you!").getDate()).isNotNull();
 	}
 }
